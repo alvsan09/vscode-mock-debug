@@ -70,19 +70,23 @@ export function activateMockDebug(context: vscode.ExtensionContext, factory?: vs
 					name: "Dynamic Launch",
 					request: "launch",
 					type: "mock",
-					program: "${file}"
+					program: "${file}",
+					stopOnEntry: true
 				},
 				{
 					name: "Another Dynamic Launch",
 					request: "launch",
 					type: "mock",
-					program: "${file}"
+					program: "${file}",
+					stopOnEntry: true
 				},
 				{
-					name: "Mock Launch",
+					name: "Mock Launch (trace on)",
 					request: "launch",
 					type: "mock",
-					program: "${file}"
+					program: "${file}",
+					stopOnEntry: true,
+					trace: true
 				}
 			];
 		}
@@ -91,62 +95,65 @@ export function activateMockDebug(context: vscode.ExtensionContext, factory?: vs
 	if (!factory) {
 		factory = new InlineDebugAdapterFactory();
 	}
+
 	context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory('mock', factory));
 	if ('dispose' in factory) {
 		context.subscriptions.push(factory);
 	}
 
+	// NOTE: registerEvaluatableExpressionProvider not currently supported by theia
 	// override VS Code's default implementation of the debug hover
 	// here we match only Mock "variables", that are words starting with an '$' 
-	context.subscriptions.push(vscode.languages.registerEvaluatableExpressionProvider('markdown', {
-		provideEvaluatableExpression(document: vscode.TextDocument, position: vscode.Position): vscode.ProviderResult<vscode.EvaluatableExpression> {
+	// context.subscriptions.push(vscode.languages.registerEvaluatableExpressionProvider('markdown', {
+	// 	provideEvaluatableExpression(document: vscode.TextDocument, position: vscode.Position): vscode.ProviderResult<vscode.EvaluatableExpression> {
 
-			const VARIABLE_REGEXP = /\$[a-z][a-z0-9]*/ig;
-			const line = document.lineAt(position.line).text;
+	// 		const VARIABLE_REGEXP = /\$[a-z][a-z0-9]*/ig;
+	// 		const line = document.lineAt(position.line).text;
 			
-			let m: RegExpExecArray | null;
-			while (m = VARIABLE_REGEXP.exec(line)) {
-				const varRange = new vscode.Range(position.line, m.index, position.line, m.index + m[0].length);
+	// 		let m: RegExpExecArray | null;
+	// 		while (m = VARIABLE_REGEXP.exec(line)) {
+	// 			const varRange = new vscode.Range(position.line, m.index, position.line, m.index + m[0].length);
 
-				if (varRange.contains(position)) {
-					return new vscode.EvaluatableExpression(varRange);
-				}
-			}
-			return undefined;
-		}
-	}));
-
+	// 			if (varRange.contains(position)) {
+	// 				return new vscode.EvaluatableExpression(varRange);
+	// 			}
+	// 		}
+	// 		return undefined;
+	// 	}
+	// }));
 	// override VS Code's default implementation of the "inline values" feature"
-	context.subscriptions.push(vscode.languages.registerInlineValuesProvider('markdown', {
 
-		provideInlineValues(document: vscode.TextDocument, viewport: vscode.Range, context: vscode.InlineValueContext) : vscode.ProviderResult<vscode.InlineValue[]> {
+	// // NOTE: registerInlineValuesProvider not currently supported by theia
+	// context.subscriptions.push(vscode.languages.registerInlineValuesProvider('markdown', {
 
-			const allValues: vscode.InlineValue[] = [];
+	// 	provideInlineValues(document: vscode.TextDocument, viewport: vscode.Range, context: vscode.InlineValueContext): vscode.ProviderResult<vscode.InlineValue[]> {
 
-			for (let l = viewport.start.line; l <= context.stoppedLocation.end.line; l++) {
-				const line = document.lineAt(l);
-				var regExp = /\$([a-z][a-z0-9]*)/ig;	// variables are words starting with '$'
-				do {
-					var m = regExp.exec(line.text);
-					if (m) {
-						const varName = m[1];
-						const varRange = new vscode.Range(l, m.index, l, m.index + varName.length);
+	// 		const allValues: vscode.InlineValue[] = [];
 
-						// some literal text
-						//allValues.push(new vscode.InlineValueText(varRange, `${varName}: ${viewport.start.line}`));
+	// 		for (let l = viewport.start.line; l <= context.stoppedLocation.end.line; l++) {
+	// 			const line = document.lineAt(l);
+	// 			var regExp = /\$([a-z][a-z0-9]*)/ig;	// variables are words starting with '$'
+	// 			do {
+	// 				var m = regExp.exec(line.text);
+	// 				if (m) {
+	// 					const varName = m[1];
+	// 					const varRange = new vscode.Range(l, m.index, l, m.index + varName.length);
 
-						// value found via variable lookup
-						allValues.push(new vscode.InlineValueVariableLookup(varRange, varName, false));
+	// 					// some literal text
+	// 					//allValues.push(new vscode.InlineValueText(varRange, `${varName}: ${viewport.start.line}`));
 
-						// value determined via expression evaluation
-						//allValues.push(new vscode.InlineValueEvaluatableExpression(varRange, varName));
-					}
-				} while (m);
-			}
+	// 					// value found via variable lookup
+	// 					allValues.push(new vscode.InlineValueVariableLookup(varRange, varName, false));
 
-			return allValues;
-		}
-	}));
+	// 					// value determined via expression evaluation
+	// 					//allValues.push(new vscode.InlineValueEvaluatableExpression(varRange, varName));
+	// 				}
+	// 			} while (m);
+	// 		}
+
+	// 		return allValues;
+	// 	}
+	// }));
 }
 
 class MockConfigurationProvider implements vscode.DebugConfigurationProvider {

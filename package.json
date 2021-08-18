@@ -164,8 +164,8 @@
           {
             "type": "mock",
             "request": "launch",
-            "name": "Ask for file name",
-            "program": "${workspaceFolder}/${command:AskForProgramName}",
+            "name": "Mock - Debug selected file in editor",
+            "program": "${file}",
             "stopOnEntry": true
           }
         ],
@@ -176,8 +176,8 @@
             "body": {
               "type": "mock",
               "request": "launch",
-              "name": "Ask for file name",
-              "program": "^\"\\${workspaceFolder}/\\${command:AskForProgramName}\"",
+              "name": "Mock - debug selected file in editor",
+              "program": "^\"\\${file}\"",
               "stopOnEntry": true
             }
           }

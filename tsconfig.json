@@ -21,7 +21,8 @@
 		"inlineSourceMap": false,
 		"preserveConstEnums": true,
 		"strictNullChecks": true,
-		"noUnusedParameters": false
+		"noUnusedParameters": false,
+		"typeRoots": ["./node_modules/@types"]
 	},
 	"exclude": [
 		"node_modules"
