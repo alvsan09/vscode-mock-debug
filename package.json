@@ -67,7 +67,6 @@
   "browser": "./dist/web/extension.js",
   "activationEvents": [
     "onDebugResolve:mock",
-    "onDebugDynamicConfigurations:mock",
     "onCommand:extension.mock-debug.getProgramName",
     "onCommand:extension.mock-debug.runEditorContents",
     "onCommand:extension.mock-debug.debugEditorContents"
@@ -164,8 +163,8 @@
           {
             "type": "mock",
             "request": "launch",
-            "name": "Ask for file name",
-            "program": "${workspaceFolder}/${command:AskForProgramName}",
+            "name": "Mock - Debug selected file in editor",
+            "program": "${file}",
             "stopOnEntry": true
           }
         ],
@@ -176,8 +175,8 @@
             "body": {
               "type": "mock",
               "request": "launch",
-              "name": "Ask for file name",
-              "program": "^\"\\${workspaceFolder}/\\${command:AskForProgramName}\"",
+              "name": "Mock - debug selected file in editor",
+              "program": "^\"\\${file}\"",
               "stopOnEntry": true
             }
           }

@@ -12,13 +12,13 @@ import { join } from 'path';
 import { platform } from 'process';
 import { ProviderResult } from 'vscode';
 import { MockDebugSession } from './mockDebug';
-import { activateMockDebug, workspaceFileAccessor } from './activateMockDebug';
+import { activateMockDebug, RunMode, workspaceFileAccessor } from './activateMockDebug';
 
 /*
  * The compile time flag 'runMode' controls how the debug adapter is run.
  * Please note: the test suite only supports 'external' mode.
  */
-const runMode: 'external' | 'server' | 'namedPipeServer' | 'inline' = 'inline';
+const runMode: RunMode = 'external';
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -26,22 +26,22 @@ export function activate(context: vscode.ExtensionContext) {
 	switch (runMode) {
 		case 'server':
 			// run the debug adapter as a server inside the extension and communicate via a socket
-			activateMockDebug(context, new MockDebugAdapterServerDescriptorFactory());
+			activateMockDebug(context, runMode, new MockDebugAdapterServerDescriptorFactory());
 			break;
 
 		case 'namedPipeServer':
 			// run the debug adapter as a server inside the extension and communicate via a named pipe (Windows) or UNIX domain socket (non-Windows)
-			activateMockDebug(context, new MockDebugAdapterNamedPipeServerDescriptorFactory());
+			activateMockDebug(context, runMode, new MockDebugAdapterNamedPipeServerDescriptorFactory());
 			break;
 
 		case 'external': default:
 			// run the debug adapter as a separate process
-			activateMockDebug(context, new DebugAdapterExecutableFactory());
+			activateMockDebug(context, runMode, new DebugAdapterExecutableFactory());
 			break;
 
 		case 'inline':
 			// run the debug adapter inside the extension and directly talk to it
-			activateMockDebug(context);
+			activateMockDebug(context, runMode);
 			break;
 	}
 }
@@ -53,7 +53,7 @@ export function deactivate() {
 class DebugAdapterExecutableFactory implements vscode.DebugAdapterDescriptorFactory {
 
 	// The following use of a DebugAdapter factory shows how to control what debug adapter executable is used.
-	// Since the code implements the default behavior, it is absolutely not neccessary and we show it here only for educational purpose.
+	// Since the code implements the default behavior, it is absolutely not necessary and we show it here only for educational purpose.
 
 	createDebugAdapterDescriptor(_session: vscode.DebugSession, executable: vscode.DebugAdapterExecutable | undefined): ProviderResult<vscode.DebugAdapterDescriptor> {
 		// param "executable" contains the executable optionally specified in the package.json (if any)

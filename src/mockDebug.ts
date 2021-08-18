@@ -225,7 +225,13 @@ export class MockDebugSession extends LoggingDebugSession {
 	protected async setBreakPointsRequest(response: DebugProtocol.SetBreakpointsResponse, args: DebugProtocol.SetBreakpointsArguments): Promise<void> {
 
 		const path = args.source.path as string;
-		const clientLines = args.lines || [];
+		let clientLines:number[] = [];
+		// SetBreakpointsArguments#lines is deprecated
+		if (args.lines) {
+			clientLines.push(...args.lines);
+		} else if (args.breakpoints) {
+			args.breakpoints.forEach(p => clientLines.push(p.line));
+		}
 
 		// clear all breakpoints for this file
 		this._runtime.clearBreakpoints(path);

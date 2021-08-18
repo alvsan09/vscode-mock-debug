@@ -10,7 +10,7 @@
 			"name": "Debug readme.md",
 			"program": "${workspaceFolder}/readme.md",
 			"stopOnEntry": true,
-			"trace": false
+			"trace": true
 		}
 	]
 }
