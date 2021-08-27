@@ -63,35 +63,35 @@ export function activateMockDebug(context: vscode.ExtensionContext, runMode?: Ru
 	const provider = new MockConfigurationProvider();
 	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('mock', provider));
 
-	// // register a dynamic configuration provider for 'mock' debug type
-	// context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('mock', {
-	// 	provideDebugConfigurations(folder: WorkspaceFolder | undefined): ProviderResult<DebugConfiguration[]> {
-	// 		return [
-	// 			{
-	// 				name: "Dynamic Launch",
-	// 				request: "launch",
-	// 				type: "mock",
-	// 				program: "${file}",
-	// 				stopOnEntry: true
-	// 			},
-	// 			{
-	// 				name: "Another Dynamic Launch",
-	// 				request: "launch",
-	// 				type: "mock",
-	// 				program: "${file}",
-	// 				stopOnEntry: true
-	// 			},
-	// 			{
-	// 				name: "Mock Launch (trace on)",
-	// 				request: "launch",
-	// 				type: "mock",
-	// 				program: "${file}",
-	// 				stopOnEntry: true,
-	// 				trace: true
-	// 			}
-	// 		];
-	// 	}
-	// }, vscode.DebugConfigurationProviderTriggerKind.Dynamic));
+	// register a dynamic configuration provider for 'mock' debug type
+	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('mock', {
+		provideDebugConfigurations(folder: WorkspaceFolder | undefined): ProviderResult<DebugConfiguration[]> {
+			return [
+				{
+					name: "Dynamic Launch",
+					request: "launch",
+					type: "mock",
+					program: "${file}",
+					stopOnEntry: true
+				},
+				{
+					name: "Another Dynamic Launch",
+					request: "launch",
+					type: "mock",
+					program: "${file}",
+					stopOnEntry: true
+				},
+				{
+					name: "Mock Launch (trace on)",
+					request: "launch",
+					type: "mock",
+					program: "${file}",
+					stopOnEntry: true,
+					trace: true
+				}
+			];
+		}
+	}, vscode.DebugConfigurationProviderTriggerKind.Dynamic));
 
 	context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory('mock', factory));
 	if ('dispose' in factory) {
