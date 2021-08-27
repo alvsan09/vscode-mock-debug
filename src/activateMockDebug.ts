@@ -179,6 +179,7 @@ class MockConfigurationProvider implements vscode.DebugConfigurationProvider {
 			});
 		}
 
+		console.log('********* ResolveDebugConfiguration for: ' + JSON.stringify(config, undefined));
 		return config;
 	}
 }
