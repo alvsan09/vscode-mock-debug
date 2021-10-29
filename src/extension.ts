@@ -12,13 +12,13 @@ import { join } from 'path';
 import { platform } from 'process';
 import { ProviderResult } from 'vscode';
 import { MockDebugSession } from './mockDebug';
-import { activateMockDebug, RunMode, workspaceFileAccessor } from './activateMockDebug';
+import { activateMockDebug, workspaceFileAccessor } from './activateMockDebug';
 
 /*
  * The compile time flag 'runMode' controls how the debug adapter is run.
  * Please note: the test suite only supports 'external' mode.
  */
-const runMode: RunMode = 'external';
+const runMode: 'external' | 'server' | 'namedPipeServer' | 'inline' = 'inline';
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -26,22 +26,22 @@ export function activate(context: vscode.ExtensionContext) {
 	switch (runMode) {
 		case 'server':
 			// run the debug adapter as a server inside the extension and communicate via a socket
-			activateMockDebug(context, runMode, new MockDebugAdapterServerDescriptorFactory());
+			activateMockDebug(context, new MockDebugAdapterServerDescriptorFactory());
 			break;
 
 		case 'namedPipeServer':
 			// run the debug adapter as a server inside the extension and communicate via a named pipe (Windows) or UNIX domain socket (non-Windows)
-			activateMockDebug(context, runMode, new MockDebugAdapterNamedPipeServerDescriptorFactory());
+			activateMockDebug(context, new MockDebugAdapterNamedPipeServerDescriptorFactory());
 			break;
 
 		case 'external': default:
 			// run the debug adapter as a separate process
-			activateMockDebug(context, runMode, new DebugAdapterExecutableFactory());
+			activateMockDebug(context, new DebugAdapterExecutableFactory());
 			break;
 
 		case 'inline':
 			// run the debug adapter inside the extension and directly talk to it
-			activateMockDebug(context, runMode);
+			activateMockDebug(context);
 			break;
 	}
 }
