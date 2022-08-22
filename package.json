@@ -77,16 +77,6 @@
   },
   "contributes": {
     "menus": {
-      "editor/title/run": [
-        {
-          "command": "extension.mock-debug.runEditorContents",
-          "when": "resourceLangId == markdown"
-        },
-        {
-          "command": "extension.mock-debug.debugEditorContents",
-          "when": "resourceLangId == markdown"
-        }
-      ],
       "commandPalette": [
         {
           "command": "extension.mock-debug.debugEditorContents",
@@ -95,12 +85,6 @@
         {
           "command": "extension.mock-debug.runEditorContents",
           "when": "resourceLangId == markdown"
-        }
-      ],
-      "debug/variables/context": [
-        {
-          "command": "extension.mock-debug.toggleFormatting",
-          "when": "debugType == 'mock' && debugProtocolVariableMenuContext == 'simple'"
         }
       ]
     },

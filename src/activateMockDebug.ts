@@ -98,59 +98,60 @@ export function activateMockDebug(context: vscode.ExtensionContext, runMode?: Ru
 		context.subscriptions.push(factory);
 	}
 
-	// NOTE: registerEvaluatableExpressionProvider not currently supported by theia
 	// override VS Code's default implementation of the debug hover
-	// here we match only Mock "variables", that are words starting with an '$' 
-	// context.subscriptions.push(vscode.languages.registerEvaluatableExpressionProvider('markdown', {
-	// 	provideEvaluatableExpression(document: vscode.TextDocument, position: vscode.Position): vscode.ProviderResult<vscode.EvaluatableExpression> {
+	// here we match only Mock "variables", that are words starting with an '$'
+	context.subscriptions.push(vscode.languages.registerEvaluatableExpressionProvider('markdown', {
+		provideEvaluatableExpression(document: vscode.TextDocument, position: vscode.Position): vscode.ProviderResult<vscode.EvaluatableExpression> {
 
-	// 		const VARIABLE_REGEXP = /\$[a-z][a-z0-9]*/ig;
-	// 		const line = document.lineAt(position.line).text;
-			
-	// 		let m: RegExpExecArray | null;
-	// 		while (m = VARIABLE_REGEXP.exec(line)) {
-	// 			const varRange = new vscode.Range(position.line, m.index, position.line, m.index + m[0].length);
+			const VARIABLE_REGEXP = /\$[a-z][a-z0-9]*/ig;
+			const line = document.lineAt(position.line).text;
 
-	// 			if (varRange.contains(position)) {
-	// 				return new vscode.EvaluatableExpression(varRange);
-	// 			}
+			let m: RegExpExecArray | null;
+			while (m = VARIABLE_REGEXP.exec(line)) {
+				const varRange = new vscode.Range(position.line, m.index, position.line, m.index + m[0].length);
+
+				if (varRange.contains(position)) {
+					const msg = '[MockEvaluatableExpressionExtension] provide word range for position ' + JSON.stringify(position, undefined, 2) + ' > ' + JSON.stringify(varRange, undefined, 2);
+					vscode.window.showInformationMessage(msg);
+
+					return new vscode.EvaluatableExpression(varRange);
+				}
+			}
+			return undefined;
+		}
+	}));
+
+	// // override VS Code's default implementation of the "inline values" feature"
+	// context.subscriptions.push(vscode.languages.registerInlineValuesProvider('markdown', {
+
+	// 	provideInlineValues(document: vscode.TextDocument, viewport: vscode.Range, context: vscode.InlineValueContext): vscode.ProviderResult<vscode.InlineValue[]> {
+
+	// 		const allValues: vscode.InlineValue[] = [];
+
+	// 		for (let l = viewport.start.line; l <= context.stoppedLocation.end.line; l++) {
+	// 			const line = document.lineAt(l);
+	// 			var regExp = /\$([a-z][a-z0-9]*)/ig;	// variables are words starting with '$'
+	// 			do {
+	// 				var m = regExp.exec(line.text);
+	// 				if (m) {
+	// 					const varName = m[1];
+	// 					const varRange = new vscode.Range(l, m.index, l, m.index + varName.length);
+
+	// 					// some literal text
+	// 					//allValues.push(new vscode.InlineValueText(varRange, `${varName}: ${viewport.start.line}`));
+
+	// 					// value found via variable lookup
+	// 					allValues.push(new vscode.InlineValueVariableLookup(varRange, varName, false));
+
+	// 					// value determined via expression evaluation
+	// 					//allValues.push(new vscode.InlineValueEvaluatableExpression(varRange, varName));
+	// 				}
+	// 			} while (m);
 	// 		}
-	// 		return undefined;
+
+	// 		return allValues;
 	// 	}
 	// }));
-	if (runMode === 'inline') {
-		// override VS Code's default implementation of the "inline values" feature"
-		context.subscriptions.push(vscode.languages.registerInlineValuesProvider('markdown', {
-	
-			provideInlineValues(document: vscode.TextDocument, viewport: vscode.Range, context: vscode.InlineValueContext): vscode.ProviderResult<vscode.InlineValue[]> {
-	
-				const allValues: vscode.InlineValue[] = [];
-	
-				for (let l = viewport.start.line; l <= context.stoppedLocation.end.line; l++) {
-					const line = document.lineAt(l);
-					var regExp = /\$([a-z][a-z0-9]*)/ig;	// variables are words starting with '$'
-					do {
-						var m = regExp.exec(line.text);
-						if (m) {
-							const varName = m[1];
-							const varRange = new vscode.Range(l, m.index, l, m.index + varName.length);
-	
-							// some literal text
-							//allValues.push(new vscode.InlineValueText(varRange, `${varName}: ${viewport.start.line}`));
-	
-							// value found via variable lookup
-							allValues.push(new vscode.InlineValueVariableLookup(varRange, varName, false));
-	
-							// value determined via expression evaluation
-							//allValues.push(new vscode.InlineValueEvaluatableExpression(varRange, varName));
-						}
-					} while (m);
-				}
-	
-				return allValues;
-			}
-		}));
-	}
 }
 
 class MockConfigurationProvider implements vscode.DebugConfigurationProvider {
